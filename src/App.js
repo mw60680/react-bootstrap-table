@@ -69,26 +69,8 @@ function App() {
   // const products = productsGenerator();
   const [products, setProducts] = useState(productsGenerator());
 
-  const productIds = products.map(item => item.price);
-
-  const filterByPrice = (filterVals, data) => {
-    if(filterVals.length > 0) {
-      let filteredData = [];
-      filterVals.map((item) => {
-        filteredData.push(...data.filter(product => product.price.toString() === item));
-      })
-      return filteredData;
-    }
-    return data;
-  }
-
-  // const updateData = (filterVals) => {
-  //   let newData = [];
-  //   filterVals.forEach((item, index) => {
-  //     newData.push(...products.filter(product => product.price.toString() === item));
-  //   });
-  //   setProducts(newData);
-  // }
+  const productNames = products.map(item => item.name);
+  const productPrices = products.map(item => item.price);
 
   const columns = [{
     dataField: 'id',
@@ -96,16 +78,19 @@ function App() {
   }, {
     dataField: 'name',
     text: 'Product Name',
-    filter: textFilter()
+    filter: customFilter({
+      type: FILTER_TYPES.MULTISELECT,
+    }),
+    filterRenderer: (onFilter, column) =>
+      <PriceFilter onFilter={ onFilter } column={ column } filterData={productNames} />
   }, {
     dataField: 'price',
     text: 'Product Price',
     filter: customFilter({
       type: FILTER_TYPES.MULTISELECT,
-      onFilter: filterByPrice,
     }),
     filterRenderer: (onFilter, column) =>
-      <PriceFilter onFilter={ onFilter } column={ column } filterData={productIds}/>
+      <PriceFilter onFilter={ onFilter } column={ column } filterData={productPrices} />
   }];
 
   return <BootstrapTable keyField='id' data={ products } columns={ columns } filter={ filterFactory() } />
